@@ -1,8 +1,9 @@
 include include.mk
 TARGET_DIR 				:= target
-INIT_DIR 				= init
+INIT_DIR 				:= init
 MODULES 				:= kern
-INIT_FILES 				= $(wildcard $(INIT_DIR)/*.o)
+INIT_FILES 				:= $(wildcard $(INIT_DIR)/*.[cS])
+INIT_OBJS 				:= $(addsuffix .o, $(basename $(INIT_FILES)))
 ARCHIVES 				:= $(addprefix $(ARCHIVE_DIR)/,$(addsuffix .a,$(MODULES)))
 TARGET 					:= $(TARGET_DIR)/test_bin
 
@@ -11,10 +12,9 @@ LD_SCRIPT				:= kernel.lds
 
 all: $(TARGET)
 
-$(TARGET): $(ARCHIVES)
-	$(MAKE) -C $(INIT_DIR)
+$(TARGET): $(ARCHIVES) $(INIT_OBJS)
 	if [ ! -d $(TARGET_DIR) ]; then mkdir $(TARGET_DIR); fi 
-	$(CC) -o $(TARGET) $(INIT_FILES) $(ARCHIVES) \
+	$(CC) -o $(TARGET) $(ARCHIVES) $(INIT_OBJS) \
 	$(CFLAGS) $(LDFLAGS) -T $(LD_SCRIPT) 
 
 $(ARCHIVES):
@@ -50,7 +50,8 @@ dts : $(TARGET_DIR)
 .PHONY: clean all
 clean: 
 	for d in $(MODULES); do $(MAKE) -C $$d clean;done
-	- rm $(ARCHIVE_DIR) $(TARGET_DIR) -rf
+	- rm $(ARCHIVE_DIR) $(TARGET_DIR) $(INIT_OBJS) -rf
+
 
 
 
