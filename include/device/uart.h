@@ -12,7 +12,8 @@
         :: "r"((uint8_t)c), "r"(UART_DR)); \
     } while(0);
 
-
+#define uart_read()    \
+    ({})
 
 
 
