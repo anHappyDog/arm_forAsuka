@@ -1,7 +1,7 @@
 include include.mk
 TARGET_DIR 				:= target
 INIT_DIR 				:= init
-MODULES 				:= kern
+MODULES 				:= lib kern
 INIT_FILES 				:= $(wildcard $(INIT_DIR)/*.[cS])
 INIT_OBJS 				:= $(addsuffix .o, $(basename $(INIT_FILES)))
 ARCHIVES 				:= $(addprefix $(ARCHIVE_DIR)/,$(addsuffix .a,$(MODULES)))
@@ -19,12 +19,16 @@ $(TARGET): $(ARCHIVES) $(INIT_OBJS)
 
 $(ARCHIVES):
 	for d in $(MODULES); do  \
-		$(MAKE) -C $$d $$d.a; 		\
+		$(MAKE) -C $$d; 		\
 	done
 
 
+qemu-gdb : $(TARGET)
+	$(QEMU_SYSTEM) $(QEMU_FLAGS) -kernel $(TARGET) -S -s 
+
 qemu-run : $(TARGET)
 	$(QEMU_SYSTEM) $(QEMU_FLAGS) -kernel $(TARGET)
+
 
 gdb : $(TARGET)
 	$(GDB) --eval-command 'target remote :1234' $(TARGET)
@@ -39,7 +43,8 @@ dts : $(TARGET_DIR)
 
 
 %.o : %.c 
-	$(CC) $^ $(CFLAGS) -I $(INCLUDE_DIR)  -o $@ 
+	$(CC) -o $@ -c $< $(CFLAGS) -I $(INCLUDE_DIR)
+
 
 %.o : %.S 
 	$(AS) $^  -I $(INCLUDE_DIR) -o $@

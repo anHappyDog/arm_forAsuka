@@ -1,4 +1,4 @@
-ARCHIVE 	:= kern.a
+ARCHIVE 	:= lib.a
 SRCS 		:= $(wildcard *.[cS])
 OBJS 		:= $(addsuffix .o,$(basename $(SRCS)))
 
