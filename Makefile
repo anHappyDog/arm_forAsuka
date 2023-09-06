@@ -1,7 +1,7 @@
 include include.mk
 TARGET_DIR 				:= target
 INIT_DIR 				:= init
-MODULES 				:= lib kern
+MODULES 				:= kern lib
 INIT_FILES 				:= $(wildcard $(INIT_DIR)/*.[cS])
 INIT_OBJS 				:= $(addsuffix .o, $(basename $(INIT_FILES)))
 ARCHIVES 				:= $(addprefix $(ARCHIVE_DIR)/,$(addsuffix .a,$(MODULES)))
@@ -14,8 +14,8 @@ all: $(TARGET)
 
 $(TARGET): $(ARCHIVES) $(INIT_OBJS)
 	if [ ! -d $(TARGET_DIR) ]; then mkdir $(TARGET_DIR); fi 
-	$(CC) -o $(TARGET) $(ARCHIVES) $(INIT_OBJS) \
-	$(CFLAGS) $(LDFLAGS) -T $(LD_SCRIPT) 
+	$(CC) -o $(TARGET) $(INIT_OBJS) $(ARCHIVES)  \
+	$(CFLAGS) $(LDFLAGS) -T $(LD_SCRIPT)  -I $(INCLUDE_DIR)
 
 $(ARCHIVES):
 	for d in $(MODULES); do  \
